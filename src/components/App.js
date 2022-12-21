@@ -20,60 +20,27 @@ export class App extends Component {
     status: 'idle',
     error: null,
     visible: false,
+    totalPages: 0,
   };
 
-  async componentDidUpdate(_, pS) {
+  async componentDidUpdate(_, prevState) {
     const { inputValue, page } = this.state;
 
-    if (pS.inputValue !== inputValue || pS.page !== page) {
+    if (prevState.inputValue !== inputValue || prevState.page !== page) {
       try {
         this.setState({ loading: true });
-        const resp = await getImages(inputValue, page);
-        const imagesData = resp.data.hits;
+        const { images, totalPages } = await getImages(inputValue, page);
 
-        if (imagesData.length === 0) {
+        if (images.length === 0) {
           throw new Error('Not a valid word');
         }
 
-        this.setState({
-          images:
-            pS.inputValue === inputValue
-              ? [
-                  ...pS.images,
-                  ...imagesData.map(
-                    ({ id, webformatURL, largeImageURL, tags }) => ({
-                      id,
-                      webformatURL,
-                      largeImageURL,
-                      tags,
-                    })
-                  ),
-                ]
-              : [
-                  ...imagesData.map(
-                    ({ id, webformatURL, largeImageURL, tags }) => ({
-                      id,
-                      webformatURL,
-                      largeImageURL,
-                      tags,
-                    })
-                  ),
-                ],
+        this.setState(prevState => ({
+          images: [...prevState.images, ...images],
           loading: false,
           status: 'resolved',
-        });
-
-        // if (pS.inputValue === inputValue) {
-        //   this.setState({
-        //     images: [...pS.images,...imagesData],
-        //     loading: false,
-        //   })
-        // }else{
-        //   this.setState({
-        //     images: [...imagesData],
-        //     loading: false,
-        //   })
-        // }
+          totalPages,
+        }));
       } catch (error) {
         this.setState({
           status: 'rejected',
@@ -152,7 +119,7 @@ export class App extends Component {
           </p>
         )}
         {loading && <Loader />}
-        {images.length > 0 && (
+        {images.length > 0 && !loading && (
           <ButtonLoadMore
             disabled={loading}
             onClickBtn={this.onClickLoadMoreBtn}
