@@ -28,7 +28,7 @@ export class App extends Component {
 
     if (prevState.inputValue !== inputValue || prevState.page !== page) {
       try {
-        this.setState({ loading: true });
+        this.setState({ loading: true, error: null });
         const { images, totalPages } = await getImages(inputValue, page);
 
         if (images.length === 0) {
@@ -67,9 +67,9 @@ export class App extends Component {
       page: 1,
     });
   };
-  onClickLoadMoreBtn = e => {
-    this.setState(pS => ({
-      page: pS.page + 1,
+  onClickLoadMoreBtn = event => {
+    this.setState(prevState => ({
+      page: prevState.page + 1,
     }));
   };
 
@@ -86,14 +86,22 @@ export class App extends Component {
   };
 
   toggle = () => {
-    this.setState(pS => ({
-      visible: !pS.visible,
+    this.setState(prevState => ({
+      visible: !prevState.visible,
     }));
   };
 
   render() {
-    const { images, loading, selectedItem, visible, status, error } =
-      this.state;
+    const {
+      images,
+      loading,
+      page,
+      totalPages,
+      selectedItem,
+      visible,
+      status,
+      error,
+    } = this.state;
     const { largeImageURL, tags } = selectedItem;
 
     return (
@@ -119,7 +127,7 @@ export class App extends Component {
           </p>
         )}
         {loading && <Loader />}
-        {images.length > 0 && !loading && (
+        {images.length > 0 && totalPages !== page && !loading && (
           <ButtonLoadMore
             disabled={loading}
             onClickBtn={this.onClickLoadMoreBtn}
