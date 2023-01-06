@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import { ButtonLoadMore } from './ButtonLoadMore/Button';
 import { ImageGallery } from './ImageGallery/ImageGallery';
@@ -9,106 +9,112 @@ import { getImages } from '../service/api';
 
 import 'react-toastify/dist/ReactToastify.css';
 
-export class App extends Component {
-  state = {
-    inputValue: '',
-    images: [],
-    page: 1,
-    selectedItem: [],
+export const App =()=> {
+  
+  const [inputValue, setInputValue] = useState('');
+  const [images, setImages] = useState([]);
+  const [page, setPage] = useState(1);
+  const [selectedItem,setSelectedItem] = useState([]);
 
-    loading: false,
-    status: 'idle',
-    error: null,
-    visible: false,
-    totalPages: 0,
+  const [loading,setLoading] = useState(false);
+  const [status,setStatus] = useState('idle');
+  const [error,setError] = useState(null);
+  const [visible,setVisible] = useState(false);
+  const [totalPages,setTotalPages] = useState(0);
   };
 
-  async componentDidUpdate(_, prevState) {
-    const { inputValue, page } = this.state;
+useEffect(() => {
+  //async componentDidUpdate(_, prevState) {
+  //const { inputValue, page } = this.state;
 
-    if (prevState.inputValue !== inputValue || prevState.page !== page) {
-      try {
-        this.setState({ loading: true, error: null });
-        const { images, totalPages } = await getImages(inputValue, page);
+  if (inputValue !== `` || page !== 1) {
+    return;
+  }
+  const fetchData = async () => {
+    setLoading(true)
+      setError(null)
+    
+    try {
+      //this.setState({ loading: true, error: null });
+      
+      const { images, totalPages } = await getImages(inputValue, page);
+    
+      if (images.length === 0) {
+        throw new Error('Not a valid word');
+      }
 
-        if (images.length === 0) {
-          throw new Error('Not a valid word');
-        }
-
-        this.setState(prevState => ({
-          images: [...prevState.images, ...images],
-          loading: false,
-          status: 'resolved',
-          totalPages,
-        }));
-      } catch (error) {
-        this.setState({
-          status: 'rejected',
-          loading: false,
-          error,
-        });
-        console.log(error);
+      const setImages = (images) => ([]) => {
+           
+        setLoading(false)
+        setStatus('resolved')
+        setTotalPages(totalPages)
+      };
+       {
+        //this.setState({
+        setStatus('rejected');
+        setLoading(false);
+        setError(error),
+      
+          console.log(error);
       }
     }
-  }
+  
 
-  handleSubmit = inputValue => {
-    if (inputValue === '') {
-      toast('Write something', {
-        position: toast.POSITION.BOTTOM_CENTER,
-      });
-      return;
+  catch handleSubmit = inputValue => {
+      if (inputValue === '') 
+        toast('Write something', {
+          position: toast.POSITION.BOTTOM_CENTER,
+        });
+        return;
+      };
+
+      //this.setState({
+      setInputValue(inputValue);
+      setLoading(false);
+      setImages([]);
+      setPage(1);
+    }
+  
+     const onClickLoadMoreBtn = event => {
+     setPage (page => 
+         page + 1
+      )
     }
 
-    this.setState({
-      inputValue,
-      loading: false,
-      images: [],
-      page: 1,
-    });
-  };
-  onClickLoadMoreBtn = event => {
-    this.setState(prevState => ({
-      page: prevState.page + 1,
-    }));
-  };
+    const onClickCard = id => {
+      // const { images } = this.state;
 
-  onClickCard = id => {
-    const { images } = this.state;
+      const item = images.find(img => img.id === id);
+      console.log(item);
 
-    const item = images.find(img => img.id === id);
-    console.log(item);
+      setSelectedItem(item);
+      toggle();
+    };
 
-    this.setState({
-      selectedItem: item,
-    });
-    this.toggle();
-  };
+    const toggle = () => {
+      setVisible(prevState => 
+         !prevState.visible
+      );
+    };
 
-  toggle = () => {
-    this.setState(prevState => ({
-      visible: !prevState.visible,
-    }));
-  };
-
-  render() {
-    const {
-      images,
-      loading,
-      page,
-      totalPages,
-      selectedItem,
-      visible,
-      status,
-      error,
-    } = this.state;
+    // render() {
+    // const {
+    // images,
+    // loading,
+    // page,
+    // totalPages,
+    //selectedItem,
+    //visible,
+    //status,
+    // error,
+    // } = this.state;
     const { largeImageURL, tags } = selectedItem;
 
     return (
       <div>
-        <Searchbar onSubmit={this.handleSubmit} />
+        <Searchbar onSubmit={handleSubmit} />
         {status === 'resolved' && (
-          <ImageGallery imgData={images} onClickCard={this.onClickCard} />
+          <ImageGallery imgData={images} onClickCard={onClickCard} />
         )}
         {status === 'idle' && (
           <p
@@ -130,14 +136,13 @@ export class App extends Component {
         {images.length > 0 && totalPages !== page && !loading && (
           <ButtonLoadMore
             disabled={loading}
-            onClickBtn={this.onClickLoadMoreBtn}
+            onClickBtn={onClickLoadMoreBtn}
           />
         )}
         {visible && (
-          <Modal url={largeImageURL} tags={tags} toggle={this.toggle} />
+          <Modal url={largeImageURL} tags={tags} toggle={toggle} />
         )}
         <ToastContainer autoClose={3000} />
       </div>
     );
-  }
-}
+  })
