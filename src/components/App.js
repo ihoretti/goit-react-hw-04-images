@@ -50,7 +50,7 @@ useEffect(() => {
         setTotalPages(totalPages)
       }
     }
-    catch
+    catch(error)
        {
         //this.setState({
         setStatus('rejected');
@@ -78,13 +78,13 @@ useEffect(() => {
       setPage(1);
     }
   
-     const onClickLoadMoreBtn = event => {
+     const onClickLoadMoreBtn = (event) => {
      setPage (page => 
          page + 1
       )
      }
 
-    const onClickCard = id => {
+    const onClickCard = (id) => {
       // const { images } = this.state;
 
       const item = images.find(img => img.id === id);
