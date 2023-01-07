@@ -32,7 +32,7 @@ useEffect(() => {
   }
   const fetchData = async () => {
     setLoading(true)
-      setError(null)
+    setError(null)
     
     try {
       //this.setState({ loading: true, error: null });
@@ -50,11 +50,10 @@ useEffect(() => {
         setTotalPages(totalPages)
       }
     }
-    catch(error)
-       {
-        //this.setState({
-        setStatus('rejected');
-        setError(error),
+    catch (error) {
+      //this.setState({
+      setStatus('rejected');
+      setError(error),
         console.log(error);
     }
     finally {
@@ -64,88 +63,89 @@ useEffect(() => {
   
 
   const handleSubmit = inputValue => {
-      if (inputValue === '') 
-        toast('Write something', {
-          position: toast.POSITION.BOTTOM_CENTER,
-        });
-        return;
-      };
+    if (inputValue === '') {
+      toast('Write something', {
+        position: toast.POSITION.BOTTOM_CENTER,
+      });
+      return;
+    };
 
-      //this.setState({
-      setInputValue(inputValue);
-      setLoading(false);
-      setImages([]);
-      setPage(1);
-    }
+    //this.setState({
+    setInputValue(inputValue);
+    setLoading(false);
+    setImages([]);
+    setPage(1);
+  }
   
-     const onClickLoadMoreBtn = (event) => {
-     setPage (page => 
-         page + 1
-      )
-     }
+  const onClickLoadMoreBtn = (event) => {
+    setPage(page =>
+      page + 1
+    )
+  }
 
-    const onClickCard = (id) => {
-      // const { images } = this.state;
+  const onClickCard = (id) => {
+    // const { images } = this.state;
 
-      const item = images.find(img => img.id === id);
-      console.log(item);
+    const item = images.find(img => img.id === id);
+    console.log(item);
 
-      setSelectedItem(item);
-      toggle();
-    };
+    setSelectedItem(item);
+    toggle();
+  };
 
-    const toggle = () => {
-      setVisible(prevState => 
-         !prevState.visible
-      );
-    };
-
-    // render() {
-    // const {
-    // images,
-    // loading,
-    // page,
-    // totalPages,
-    //selectedItem,
-    //visible,
-    //status,
-    // error,
-    // } = this.state;
-    const { largeImageURL, tags } = selectedItem;
-
-    return (
-      <div>
-        <Searchbar onSubmit={handleSubmit} />
-        {status === 'resolved' && (
-          <ImageGallery imgData={images} onClickCard={onClickCard} />
-        )}
-        {status === 'idle' && (
-          <p
-            style={{
-              color: 'rgb(4, 120, 128)',
-              textAlign: 'center',
-              marginTop: '50px',
-            }}
-          >
-            Write something
-          </p>
-        )}
-        {status === 'rejected' && (
-          <p style={{ color: 'red', textAlign: 'center' }}>
-            {error?.message}! Try again!
-          </p>
-        )}
-        {loading && <Loader />}
-        {images.length > 0 && totalPages !== page && !loading && (
-          <ButtonLoadMore
-            disabled={loading}
-            onClickBtn={onClickLoadMoreBtn}
-          />
-        )}
-        {visible && (
-          <Modal url={largeImageURL} tags={tags} toggle={toggle} />
-        )}
-        <ToastContainer autoClose={3000} />
-      </div>
+  const toggle = () => {
+    setVisible(prevState =>
+      !prevState.visible
     );
-  
+  };
+
+  // render() {
+  // const {
+  // images,
+  // loading,
+  // page,
+  // totalPages,
+  //selectedItem,
+  //visible,
+  //status,
+  // error,
+  // } = this.state;
+  const { largeImageURL, tags } = selectedItem;
+
+  return (
+    <div>
+      <Searchbar onSubmit={handleSubmit} />
+      {status === 'resolved' && (
+        <ImageGallery imgData={images} onClickCard={onClickCard} />
+      )}
+      {status === 'idle' && (
+        <p
+          style={{
+            color: 'rgb(4, 120, 128)',
+            textAlign: 'center',
+            marginTop: '50px',
+          }}
+        >
+          Write something
+        </p>
+      )}
+      {status === 'rejected' && (
+        <p style={{ color: 'red', textAlign: 'center' }}>
+          {error?.message}! Try again!
+        </p>
+      )}
+      {loading && <Loader />}
+      {images.length > 0 && totalPages !== page && !loading && (
+        <ButtonLoadMore
+          disabled={loading}
+          onClickBtn={onClickLoadMoreBtn}
+        />
+      )}
+      {visible && (
+        <Modal url={largeImageURL} tags={tags} toggle={toggle} />
+      )}
+      <ToastContainer autoClose={3000} />
+    </div>
+  );
+},
+})
