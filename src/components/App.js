@@ -48,19 +48,22 @@ useEffect(() => {
         setLoading(false)
         setStatus('resolved')
         setTotalPages(totalPages)
-      };
+      }
+    }
+    catch
        {
         //this.setState({
         setStatus('rejected');
-        setLoading(false);
         setError(error),
-      
-          console.log(error);
-      }
+        console.log(error);
     }
+    finally {
+      setLoading(false);
+    }
+  }
   
 
-  catch handleSubmit = inputValue => {
+  const handleSubmit = inputValue => {
       if (inputValue === '') 
         toast('Write something', {
           position: toast.POSITION.BOTTOM_CENTER,
@@ -79,7 +82,7 @@ useEffect(() => {
      setPage (page => 
          page + 1
       )
-    }
+     }
 
     const onClickCard = id => {
       // const { images } = this.state;
@@ -145,4 +148,4 @@ useEffect(() => {
         <ToastContainer autoClose={3000} />
       </div>
     );
-  })
+  
