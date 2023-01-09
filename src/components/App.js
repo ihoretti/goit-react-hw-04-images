@@ -147,5 +147,5 @@ useEffect(() => {
       <ToastContainer autoClose={3000} />
     </div>
   );
-},
+}
 })
