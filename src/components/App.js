@@ -9,58 +9,45 @@ import { getImages } from '../service/api';
 
 import 'react-toastify/dist/ReactToastify.css';
 
-export const App =()=> {
-  
+export const App = () => {
   const [inputValue, setInputValue] = useState('');
   const [images, setImages] = useState([]);
   const [page, setPage] = useState(1);
-  const [selectedItem,setSelectedItem] = useState([]);
+  const [selectedItem, setSelectedItem] = useState(null);
 
-  const [loading,setLoading] = useState(false);
-  const [status,setStatus] = useState('idle');
-  const [error,setError] = useState(null);
-  const [visible,setVisible] = useState(false);
-  const [totalPages,setTotalPages] = useState(0);
-  };
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState('idle');
+  const [error, setError] = useState(null);
+  const [visible, setVisible] = useState(false);
+  const [totalPages, setTotalPages] = useState(0);
 
-useEffect(() => {
-  //async componentDidUpdate(_, prevState) {
-  //const { inputValue, page } = this.state;
+  useEffect(() => {
+    if (!inputValue) {
+      return;
+    }
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const { images, totalPages } = await getImages(inputValue, page);
 
-  if (inputValue !== `` || page !== 1) {
-    return;
-  }
-  const fetchData = async () => {
-    setLoading(true)
-    setError(null)
-    
-    try {
-      //this.setState({ loading: true, error: null });
-      
-      const { images, totalPages } = await getImages(inputValue, page);
-    
-      if (images.length === 0) {
-        throw new Error('Not a valid word');
+        if (images.length === 0) {
+          throw new Error('Not a valid word');
+        }
+
+        setStatus('resolved');
+        setTotalPages(totalPages);
+        setImages(prevImages => [...prevImages, ...images]);
+      } catch (error) {
+        setStatus('rejected');
+        setError(error);
+      } finally {
+        setLoading(false);
       }
+    };
 
-      const setImages = (images) => ([]) => {
-           
-        setLoading(false)
-        setStatus('resolved')
-        setTotalPages(totalPages)
-      }
-    }
-    catch (error) {
-      //this.setState({
-      setStatus('rejected');
-      setError(error),
-        console.log(error);
-    }
-    finally {
-      setLoading(false);
-    }
-  }
-  
+    fetchData();
+  }, [inputValue, page]);
 
   const handleSubmit = inputValue => {
     if (inputValue === '') {
@@ -68,49 +55,27 @@ useEffect(() => {
         position: toast.POSITION.BOTTOM_CENTER,
       });
       return;
-    };
+    }
 
-    //this.setState({
     setInputValue(inputValue);
-    setLoading(false);
     setImages([]);
     setPage(1);
-  }
-  
-  const onClickLoadMoreBtn = (event) => {
-    setPage(page =>
-      page + 1
-    )
-  }
+  };
 
-  const onClickCard = (id) => {
-    // const { images } = this.state;
+  const onClickLoadMoreBtn = () => {
+    setPage(page => page + 1);
+  };
 
-    const item = images.find(img => img.id === id);
-    console.log(item);
-
-    setSelectedItem(item);
+  const onClickCard = modalData => {
+    setSelectedItem(modalData);
     toggle();
   };
 
   const toggle = () => {
-    setVisible(prevState =>
-      !prevState.visible
-    );
+    setVisible(prevState => !prevState);
   };
 
-  // render() {
-  // const {
-  // images,
-  // loading,
-  // page,
-  // totalPages,
-  //selectedItem,
-  //visible,
-  //status,
-  // error,
-  // } = this.state;
-  const { largeImageURL, tags } = selectedItem;
+  // const { largeImageURL, tags } = selectedItem;
 
   return (
     <div>
@@ -136,16 +101,10 @@ useEffect(() => {
       )}
       {loading && <Loader />}
       {images.length > 0 && totalPages !== page && !loading && (
-        <ButtonLoadMore
-          disabled={loading}
-          onClickBtn={onClickLoadMoreBtn}
-        />
+        <ButtonLoadMore disabled={loading} onClickBtn={onClickLoadMoreBtn} />
       )}
-      {visible && (
-        <Modal url={largeImageURL} tags={tags} toggle={toggle} />
-      )}
+      {visible && <Modal modalData={selectedItem} toggle={toggle} />}
       <ToastContainer autoClose={3000} />
     </div>
   );
-}
-})
+};
