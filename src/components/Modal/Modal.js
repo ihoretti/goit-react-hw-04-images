@@ -2,7 +2,8 @@ import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Overlay, ModalBody, Img } from './Modal.styled';
 
-export const Modal = ({ url, tags, toggle }) => {
+export const Modal = ({ modalData, toggle }) => {
+  const { url, tags } = modalData;
   useEffect(() => {
     const handeleKeyDown = e => {
       if (e.code === 'Escape') {
@@ -32,7 +33,9 @@ export const Modal = ({ url, tags, toggle }) => {
 };
 
 Modal.propTypes = {
+  modalData: PropTypes.shape({
+    url: PropTypes.string.isRequired,
+    tags: PropTypes.string.isRequired,
+  }).isRequired,
   toggle: PropTypes.func.isRequired,
-  url: PropTypes.string.isRequired,
-  tags: PropTypes.string.isRequired,
 };
